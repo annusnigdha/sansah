@@ -24,8 +24,8 @@ import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestor
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
-const API_BASE = 'http://localhost:5000/api';
-const WS_BASE = 'ws://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const WS_BASE = import.meta.env.VITE_WS_URL || 'ws://localhost:5000';
 
 function SearchableDropdown({ options, value, onChange, placeholder, disabled = false }) {
   const [isOpen, setIsOpen] = useState(false);

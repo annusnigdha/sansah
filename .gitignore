@@ -38,3 +38,4 @@ backend/database.sqlite
 # Runtime generated mail/message files
 backend/mailbox/
 backend/whatsapp_outbox/
+backend/sms_outbox/
