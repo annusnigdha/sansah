@@ -219,6 +219,11 @@ app.use(cors({
 
 app.use(express.json());
 
+// Health check endpoint (used by UptimeRobot to keep backend alive)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString(), server: 'Sansah IoT Backend' });
+});
+
 // API mounting
 app.use('/api', apiRoutes);
 
@@ -479,7 +484,7 @@ Alert Severity: ${severity.toUpperCase()}
 Timestamp:      ${timestamp}
 ------------------------------------------
 
-Please log in to your Sansah dashboard at http://localhost:3000 to resolve this incident.
+Please log in to your Sansah dashboard at ${process.env.FRONTEND_URL || 'https://sansah.vercel.app'} to resolve this incident.
 
 Best regards,
 The Sansah Innovations Team`;

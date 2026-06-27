@@ -592,7 +592,7 @@ Alert Severity: ${severity.toUpperCase()}
 Timestamp:      ${timestamp}
 ------------------------------------------
 
-Please log in to your Sansah dashboard at http://localhost:3000 to resolve this incident.
+Please log in to your Sansah dashboard at ${process.env.FRONTEND_URL || 'https://sansah.vercel.app'} to resolve this incident.
 
 Best regards,
 The Sansah Innovations Team`;
@@ -821,7 +821,7 @@ Welcome to Sansah Innovations! We are thrilled to have you join our platform.
 Sansah Innovations is an enterprise-grade IoT Alert Notification & SaaS Platform. Our system provides real-time device health scoring, smart alerts prioritizations, predictive sensor anomaly analytics, GPS routes playback, and highly custom notification settings.
 
 Getting Started Instructions:
-1. Log in to your portal gateway at http://localhost:3000/ using your registered credentials.
+1. Log in to your portal gateway at ${process.env.FRONTEND_URL || 'https://sansah.vercel.app'} using your registered credentials.
 2. Link your hardware nodes and telemetry sensors under the "Asset Inventory" panel.
 3. Configure your alert channels (Dashboard, Email, WhatsApp, SMS) under the "Preferences" settings.
 4. Set up Geofences in the GPS tab to monitor mobile hardware entry and exit actions.
@@ -2870,7 +2870,7 @@ router.post('/auth/reset-password', async (req, res) => {
     }
     const user = check.rows[0];
     const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: '15m' });
-    const resetLink = `http://localhost:3000/?token=${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL || 'https://sansah.vercel.app'}/?token=${resetToken}`;
     console.log(`\n============== [PASSWORD RESET LINK] ==============`);
     console.log(`Email: ${email}`);
     console.log(`Reset Link: ${resetLink}`);

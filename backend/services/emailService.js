@@ -272,7 +272,7 @@ async function sendWelcomeEmail(to, userName, userId) {
         <div style="background-color: #0f1c29; padding: 15px; border-radius: 8px; border: 1px solid #1e293b; margin: 20px 0;">
           <h3 style="color: #00b0ff; margin-top: 0; font-size: 14px; text-transform: uppercase;">Getting Started Instructions:</h3>
           <ol style="margin: 0; padding-left: 20px;">
-            <li style="margin-bottom: 8px;">Log in to your portal gateway at <a href="http://localhost:3000/" style="color: #00b0ff; text-decoration: none; font-weight: bold;">http://localhost:3000/</a>.</li>
+            <li style="margin-bottom: 8px;">Log in to your portal gateway at <a href="${process.env.FRONTEND_URL || 'https://sansah.vercel.app'}" style="color: #00b0ff; text-decoration: none; font-weight: bold;">${process.env.FRONTEND_URL || 'https://sansah.vercel.app'}</a>.</li>
             <li style="margin-bottom: 8px;">Link your hardware nodes and telemetry sensors under the <strong>"Asset Inventory"</strong> panel.</li>
             <li style="margin-bottom: 8px;">Configure your alert channels (Dashboard, Email, WhatsApp, SMS) under the <strong>"Preferences"</strong> settings.</li>
             <li style="margin-bottom: 8px;">Set up Geofences in the GPS tab to monitor mobile hardware entry and exit actions.</li>
@@ -289,7 +289,7 @@ async function sendWelcomeEmail(to, userName, userId) {
     </div>
   `;
 
-  const text = `Hello ${userName || 'User'},\n\nWelcome to Sansah Innovations! We are thrilled to have you join our platform.\n\nAccount Information:\nName: ${userName}\nEmail: ${to}\nAccess Level: Standard IoT Operations Profile\n\nGetting Started:\n1. Log in to your portal at http://localhost:3000/\n2. Link your hardware nodes under Asset Inventory.\n3. Configure channels in Preferences.\n\nSupport:\nEmail: support@sansah.com\nPhone: +1-800-555-0199`;
+  const text = `Hello ${userName || 'User'},\n\nWelcome to Sansah Innovations! We are thrilled to have you join our platform.\n\nAccount Information:\nName: ${userName}\nEmail: ${to}\nAccess Level: Standard IoT Operations Profile\n\nGetting Started:\n1. Log in to your portal at ${process.env.FRONTEND_URL || 'https://sansah.vercel.app'}\n2. Link your hardware nodes under Asset Inventory.\n3. Configure channels in Preferences.\n\nSupport:\nEmail: support@sansah.com\nPhone: +1-800-555-0199`;
 
   const alertId = `sys_welcome_${Date.now()}`;
   try {
@@ -348,7 +348,7 @@ async function sendAlertEmail(to, alertData, userId, alertId) {
           <p style="margin: 0;"><strong>Recommended Actions:</strong><br/>${diagnostics.recommendation}</p>
         </div>
 
-        <p>Please log in to your dashboard at <a href="http://localhost:3000/" style="color: #00b0ff; text-decoration: none;">http://localhost:3000/</a> immediately to resolve this incident.</p>
+        <p>Please log in to your dashboard at <a href="${process.env.FRONTEND_URL || 'https://sansah.vercel.app'}" style="color: #00b0ff; text-decoration: none;">${process.env.FRONTEND_URL || 'https://sansah.vercel.app'}</a> immediately to resolve this incident.</p>
       </div>
       <div style="margin-top: 30px; border-top: 1px solid #1e293b; padding-top: 20px; text-align: center; font-size: 11px; color: #64748b;">
         <p style="margin: 0;">Sansah Innovations Security Operations Center</p>
@@ -356,7 +356,7 @@ async function sendAlertEmail(to, alertData, userId, alertId) {
     </div>
   `;
 
-  const text = `🚨 Threshold Limit Breached 🚨\n\nDevice Name: ${deviceName}\nSensor Name: ${sensorName}\nCurrent Value: ${currentValue}${unit}\nMax Value: ${maxValue}${unit}\nTimestamp: ${timestamp}\n\nAI Diagnostics:\nPossible Causes: ${diagnostics.cause}\nRecommended Actions: ${diagnostics.recommendation}\n\nLog in immediately: http://localhost:3000/`;
+  const text = `🚨 Threshold Limit Breached 🚨\n\nDevice Name: ${deviceName}\nSensor Name: ${sensorName}\nCurrent Value: ${currentValue}${unit}\nMax Value: ${maxValue}${unit}\nTimestamp: ${timestamp}\n\nAI Diagnostics:\nPossible Causes: ${diagnostics.cause}\nRecommended Actions: ${diagnostics.recommendation}\n\nLog in immediately: ${process.env.FRONTEND_URL || 'https://sansah.vercel.app'}`;
 
   await sendEmail({ to, subject, html, text, userId, alertId });
 }

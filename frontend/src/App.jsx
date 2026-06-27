@@ -1715,11 +1715,15 @@ export default function App() {
     setLoginLoading(true);
     try {
       const startTime = Date.now();
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail, phone: loginPhone, password: loginPassword })
+        body: JSON.stringify({ email: loginEmail, phone: loginPhone, password: loginPassword }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const duration = Date.now() - startTime;
       const data = await res.json();
       if (res.ok) {
@@ -1741,10 +1745,14 @@ export default function App() {
         }
         setLoginPassword('');
       } else {
-        setAuthError(data.error || 'Login failed');
+        setAuthError(data.error || data.message || `Login failed (server error ${res.status})`);
       }
     } catch (err) {
-      setAuthError('Telemetry gateway server is currently offline.');
+      if (err.name === 'AbortError') {
+        setAuthError('Server is waking up from sleep — please wait 30 seconds and try again.');
+      } else {
+        setAuthError('Cannot reach the server. Check your internet connection and try again.');
+      }
     } finally {
       setLoginLoading(false);
     }
@@ -1841,11 +1849,15 @@ export default function App() {
 
     try {
       const startTime = Date.now();
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const res = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const duration = Date.now() - startTime;
       const data = await res.json();
       if (res.ok) {
@@ -1861,10 +1873,14 @@ export default function App() {
         setRegPassword('');
         setRegConfirmPassword('');
       } else {
-        setAuthError(data.error || 'Registration failed');
+        setAuthError(data.error || data.message || `Registration failed (server error ${res.status})`);
       }
     } catch (err) {
-      setAuthError('Telemetry gateway server is offline.');
+      if (err.name === 'AbortError') {
+        setAuthError('Server is waking up from sleep — please wait 30 seconds and try again.');
+      } else {
+        setAuthError('Cannot reach the server. Check your internet connection and try again.');
+      }
     } finally {
       setRegLoading(false);
     }
