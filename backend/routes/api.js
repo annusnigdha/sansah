@@ -772,6 +772,10 @@ router.post('/auth/register', async (req, res) => {
     if (!name || !email || !phone || !password) {
       return res.status(400).json({ error: 'All fields (name, email, phone, password) are mandatory for User registration' });
     }
+    // Only allow @gmail.com emails for user registration
+    if (!email.toLowerCase().endsWith('@gmail.com')) {
+      return res.status(400).json({ error: 'Only Gmail addresses (@gmail.com) are allowed to register as a user.' });
+    }
   }
 
   // Validate E.164 for User Phone
