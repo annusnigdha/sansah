@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sansah Innovation - IoT Alert Notification & Tracking System</title>
+  <meta name="description" content="Advanced real-time monitoring dashboard for IoT devices, sensor boards, and live GPS trackers.">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Login Screen Overlay -->
+  <div class="login-overlay" id="login-screen">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <i data-lucide="shield-alert" style="width: 32px; height: 32px;"></i>
+        </div>
+        <h2 class="login-title">SANSAH INNOVATION</h2>
+        <p class="login-subtitle">IoT Alert & Telemetry Portal</p>
+      </div>
+      <form class="login-form" id="login-form">
+        <div class="form-group" style="display:flex; flex-direction:column; gap:8px;">
+          <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Username</label>
+          <input type="text" id="login-username" class="login-input" placeholder="Enter username..." required autofocus autocomplete="username">
+        </div>
+        <div class="form-group" style="display:flex; flex-direction:column; gap:8px;">
+          <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Password</label>
+          <input type="password" id="login-password" class="login-input" placeholder="Enter password..." required autocomplete="current-password">
+        </div>
+        <div class="login-error" id="login-error-msg">
+          Invalid username or password.
+        </div>
+        <button type="submit" class="custom-btn login-btn">
+          <span>Access Portal</span>
+          <i data-lucide="log-in" style="width: 16px;"></i>
+        </button>
+      </form>
+      <div class="login-tips">
+        <strong>Default Credentials:</strong><br>
+        Username: <code style="font-family:var(--font-mono); color:var(--color-primary);">admin</code> / Password: <code style="font-family:var(--font-mono); color:var(--color-primary);">admin</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-time Toast Notifications Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <i data-lucide="cpu" class="brand-icon"></i>
+        <span class="brand-text">Sansah Innovation</span>
+      </div>
+      
+      <ul class="sidebar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" data-target="page-dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target="page-sensors">
+            <i data-lucide="activity"></i>
+            <span>Sensor Board</span>
+            <span class="nav-badge" id="sidebar-active-sensors-badge" style="display:none;">0</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target="page-gps">
+            <i data-lucide="map-pin"></i>
+            <span>Live GPS Map</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target="page-devices">
+            <i data-lucide="server"></i>
+            <span>Device Manager</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target="page-alerts">
+            <i data-lucide="bell"></i>
+            <span>Alert Log</span>
+            <span class="nav-badge" id="sidebar-alert-badge" style="display:none;">0</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-target="page-rules">
+            <i data-lucide="sliders"></i>
+            <span>Notification Rules</span>
+          </a>
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <div class="system-status-indicator" style="margin-bottom: 12px;">
+          <span class="status-dot simulating" id="system-status-dot"></span>
+          <span id="system-status-text">Simulator Active</span>
+        </div>
+        <button class="logout-btn" id="btn-logout">
+          <i data-lucide="log-out" style="width: 14px;"></i>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-title-area">
+          <h2 id="page-title-display">Dashboard Overview</h2>
+        </div>
+        
+        <div class="header-actions">
+          <button class="mute-btn" id="btn-mute-audio" title="Toggle Alarm Audio">
+            <i data-lucide="volume-2" id="mute-icon" style="width:18px;"></i>
+          </button>
+          <div class="sim-control-panel">
+            <span class="sim-label">Live Data Sim</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="simulator-toggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div class="system-stats-brief">
+            <div class="stat-brief-item">
+              <i data-lucide="radio" style="color:var(--color-primary); width:14px;"></i>
+              <span>Uptime:</span>
+              <span id="uptime-display">00:00:00</span>
+            </div>
+            <div class="stat-brief-item">
+              <i data-lucide="heart" style="color:var(--color-danger); width:14px;"></i>
+              <span>Health:</span>
+              <span id="health-display">100%</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW: Dashboard -->
+      <main id="page-dashboard" class="page-content active">
+        <!-- Widgets Row -->
+        <div class="dashboard-grid">
+          <!-- Widget 1: Total Devices -->
+          <div class="glass-card card-primary">
+            <div class="widget-flex">
+              <div class="widget-info">
+                <span class="widget-label">Total Devices</span>
+                <span class="widget-value" id="widget-total-devices">0</span>
+              </div>
+              <div class="widget-icon">
+                <i data-lucide="server"></i>
+              </div>
+            </div>
+            <div class="widget-trend">
+              <span class="trend-up"><i data-lucide="arrow-up-right" style="width:12px;"></i> ESP32 / Arduino / NodeMCU</span>
+            </div>
+          </div>
+          
+          <!-- Widget 2: Active Sensors -->
+          <div class="glass-card card-purple">
+            <div class="widget-flex">
+              <div class="widget-info">
+                <span class="widget-label">Active Sensors</span>
+                <span class="widget-value" id="widget-active-sensors">0</span>
+              </div>
+              <div class="widget-icon">
+                <i data-lucide="activity"></i>
+              </div>
+            </div>
+            <div class="widget-trend">
+              <span class="trend-up"><i data-lucide="check" style="width:12px;"></i> Online and transmitting</span>
+            </div>
+          </div>
+
+          <!-- Widget 3: GPS Devices -->
+          <div class="glass-card card-success">
+            <div class="widget-flex">
+              <div class="widget-info">
+                <span class="widget-label">GPS Tracked</span>
+                <span class="widget-value" id="widget-gps-devices">0</span>
+              </div>
+              <div class="widget-icon">
+                <i data-lucide="map-pin"></i>
+              </div>
+            </div>
+            <div class="widget-trend">
+              <span class="trend-up"><i data-lucide="navigation" style="width:12px;"></i> Live tracking active</span>
+            </div>
+          </div>
+
+          <!-- Widget 4: Active Alerts -->
+          <div class="glass-card card-danger" id="widget-alert-card">
+            <div class="widget-flex">
+              <div class="widget-info">
+                <span class="widget-label">Active Alerts</span>
+                <span class="widget-value" id="widget-active-alerts">0</span>
+              </div>
+              <div class="widget-icon">
+                <i data-lucide="alert-triangle"></i>
+              </div>
+            </div>
+            <div class="widget-trend">
+              <span id="widget-critical-alerts-label" style="color:var(--text-muted);">0 Critical | 0 Warnings</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-layout-row">
+          <!-- Live Analytics Chart -->
+          <div class="glass-card">
+            <div class="card-header-flex">
+              <h3 class="card-title">
+                <i data-lucide="trending-up"></i>
+                <span>Overall System Sensor Trends</span>
+              </h3>
+              <div class="card-header-actions" style="display:flex; gap:10px;">
+                <button class="custom-btn custom-btn-secondary" id="btn-export-trends" style="padding: 6px 10px; font-size:0.75rem;">
+                  <i data-lucide="download" style="width:12px;"></i> Export CSV
+                </button>
+                <select id="dashboard-chart-sensor-select" class="custom-select">
+                  <option value="all">Combined Activity</option>
+                  <option value="temperature">Temperature Average</option>
+                  <option value="humidity">Humidity Average</option>
+                  <option value="water_level">Water Levels</option>
+                </select>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="dashboardTrendChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Geofence & System Events -->
+          <div class="glass-card">
+            <div class="card-header-flex">
+              <h3 class="card-title">
+                <i data-lucide="history"></i>
+                <span>Recent Activities</span>
+              </h3>
+              <button class="custom-btn custom-btn-secondary" id="clear-activity-btn" style="padding: 4px 8px; font-size:0.75rem;">Clear</button>
+            </div>
+            <div class="activity-feed" id="dashboard-activity-feed">
+              <!-- Dynamically populated -->
+              <div class="activity-item">
+                <div class="activity-icon-container info">
+                  <i data-lucide="info" style="width:16px;"></i>
+                </div>
+                <div class="activity-details">
+                  <p class="activity-text">System initialized. Awaiting device telemetry...</p>
+                  <span class="activity-time">Just now</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic health overview metrics -->
+        <div class="dashboard-grid">
+          <!-- Widget: Critical Alerts -->
+          <div class="glass-card">
+            <div class="widget-flex">
+              <div class="widget-info">
+                <span class="widget-label">Total Alert Events</span>
+                <span class="widget-value" id="widget-total-alerts-count" style="font-size: 1.8rem;">0</span>
+              </div>
+              <div class="widget-icon" style="width:40px; height:40px;">
+                <i data-lucide="bell-ring" style="width:20px;"></i>
+              </div>
+            </div>
+          </div>
+          <!-- Widget: Geofence Events -->
+          <div class="glass-card">
+            <div class="widget-flex">
+              <div class="widget-info">
+                <span class="widget-label">Geofence Violations</span>
+                <span class="widget-value" id="widget-geofence-events" style="font-size: 1.8rem; color: var(--color-warning);">0</span>
+              </div>
+              <div class="widget-icon" style="width:40px; height:40px;">
+                <i data-lucide="shield-alert" style="width:20px;"></i>
+              </div>
+            </div>
+          </div>
+          <!-- Widget: Device Health Score -->
+          <div class="glass-card">
+            <div class="widget-flex">
+              <div class="widget-info">
+                <span class="widget-label">System Health Score</span>
+                <span class="widget-value" id="widget-health-score" style="font-size: 1.8rem; color: var(--color-success);">100%</span>
+              </div>
+              <div class="widget-icon" style="width:40px; height:40px;">
+                <i data-lucide="heart" style="width:20px;"></i>
+              </div>
+            </div>
+          </div>
+          <!-- Widget: Average Battery -->
+          <div class="glass-card">
+            <div class="widget-flex">
+              <div class="widget-info">
+                <span class="widget-label">Avg Device Battery</span>
+                <span class="widget-value" id="widget-avg-battery" style="font-size: 1.8rem; color: var(--color-info);">--%</span>
+              </div>
+              <div class="widget-icon" style="width:40px; height:40px;">
+                <i data-lucide="battery" style="width:20px;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- VIEW: Sensor Board -->
+      <main id="page-sensors" class="page-content">
+        <!-- Filter Panel -->
+        <section class="filter-bar">
+          <div class="filter-group">
+            <label for="filter-search">Search Sensor/Device</label>
+            <input type="text" id="filter-search" placeholder="Enter ID or name..." class="search-input">
+          </div>
+          <div class="filter-group">
+            <label for="filter-type">Sensor Type</label>
+            <select id="filter-type" class="custom-select">
+              <option value="all">All Types</option>
+              <option value="DHT11 Temperature">Temperature</option>
+              <option value="DHT11 Humidity">Humidity</option>
+              <option value="Motion Sensor">Motion</option>
+              <option value="Water Level Sensor">Water Level</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filter-status">Status</label>
+            <select id="filter-status" class="custom-select">
+              <option value="all">All States</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filter-alert">Alert Level</label>
+            <select id="filter-alert" class="custom-select">
+              <option value="all">All Levels</option>
+              <option value="normal">Normal</option>
+              <option value="warning">Warning</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+          <div class="filter-group" style="margin-left: auto; align-self: flex-end;">
+            <button class="custom-btn" id="btn-reset-filters">
+              <i data-lucide="refresh-cw" style="width:14px;"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Sensor Grid -->
+        <div class="sensor-grid" id="sensors-grid-container">
+          <!-- Dynamically populated -->
+        </div>
+      </main>
+
+      <!-- VIEW: GPS Map -->
+      <main id="page-gps" class="page-content">
+        <div class="gps-tracking-layout">
+          <!-- Map Section -->
+          <div class="map-container-wrapper glass-card" style="padding: 0; overflow: hidden;">
+            <div id="leaflet-gps-map"></div>
+          </div>
+          
+          <!-- GPS Sidebar / Geofence controller -->
+          <div class="gps-device-sidebar">
+            <!-- Geofence Controller -->
+            <div class="glass-card">
+              <div class="card-header-flex" style="margin-bottom: 12px;">
+                <h4 class="card-title" style="font-size: 0.95rem;">
+                  <i data-lucide="shield" style="width:16px;"></i>
+                  <span>Geofences</span>
+                </h4>
+                <button class="custom-btn" id="btn-add-geofence" style="padding:4px 8px; font-size:0.75rem;">
+                  <i data-lucide="plus" style="width:12px;"></i> Add
+                </button>
+              </div>
+              <div class="geofence-list" id="gps-geofence-list">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- GPS Devices List -->
+            <div class="glass-card" style="flex-grow:1;">
+              <h4 class="card-title" style="font-size: 0.95rem; margin-bottom: 12px;">
+                <i data-lucide="navigation" style="width:16px;"></i>
+                <span>GPS Trackers</span>
+              </h4>
+              <div class="gps-device-list" id="gps-device-list-container">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- VIEW: Device Manager -->
+      <main id="page-devices" class="page-content">
+        <div class="device-manager-layout">
+          <div class="glass-card">
+            <div class="card-header-flex">
+              <h3 class="card-title">
+                <i data-lucide="server"></i>
+                <span>Registered IoT Devices</span>
+              </h3>
+              <button class="custom-btn" id="btn-register-device">
+                <i data-lucide="plus"></i>
+                <span>Register Device</span>
+              </button>
+            </div>
+            
+            <div class="device-table-container">
+              <table class="device-table">
+                <thead>
+                  <tr>
+                    <th>Device Details</th>
+                    <th>Hardware Type</th>
+                    <th>Sensors Connected</th>
+                    <th>GPS Status</th>
+                    <th>Connectivity</th>
+                    <th>Health & Battery</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="device-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- VIEW: Alert Log -->
+      <main id="page-alerts" class="page-content">
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <h3 class="card-title">
+              <i data-lucide="bell"></i>
+              <span>Active Alert & System Event Log</span>
+            </h3>
+            <div class="card-header-actions" style="display:flex; gap:10px;">
+              <button class="custom-btn custom-btn-secondary" id="btn-export-alerts">
+                <i data-lucide="download" style="width:14px;"></i> Export CSV
+              </button>
+              <select id="alert-log-filter" class="custom-select">
+                <option value="all">All Events</option>
+                <option value="critical">Critical Only</option>
+                <option value="warning">Warnings Only</option>
+                <option value="geofence">Geofence Events</option>
+                <option value="system">System Status</option>
+              </select>
+              <button class="custom-btn custom-btn-danger" id="clear-alerts-btn">
+                <i data-lucide="trash-2" style="width:14px;"></i> Clear Log
+              </button>
+            </div>
+          </div>
+          
+          <div class="activity-feed" id="full-alert-log" style="max-height: calc(100vh - 250px);">
+            <!-- Dynamically populated alerts -->
+          </div>
+        </div>
+      </main>
+
+      <!-- VIEW: Notification Rules -->
+      <main id="page-rules" class="page-content">
+        <div class="rules-layout">
+          
+          <!-- Create Rule Card -->
+          <div class="glass-card">
+            <h3 class="card-title" style="margin-bottom: 20px;">
+              <i data-lucide="bell-ring"></i>
+              <span>Configure Notification Rule</span>
+            </h3>
+            
+            <form id="form-create-rule" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="form-group" style="display:flex; flex-direction:column; gap:8px;">
+                <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Select Target Device *</label>
+                <select id="rule-device" class="custom-select" style="width:100%;" required>
+                  <option value="all">All Registered Devices</option>
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+              
+              <div class="form-group" style="display:flex; flex-direction:column; gap:8px;">
+                <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Sensor Type *</label>
+                <select id="rule-sensor-type" class="custom-select" style="width:100%;" required>
+                  <option value="all">All Sensor Modules</option>
+                  <option value="DHT11 Temperature">DHT11 Temperature Sensor</option>
+                  <option value="DHT11 Humidity">DHT11 Humidity Sensor</option>
+                  <option value="Motion Sensor">PIR Motion Detector</option>
+                  <option value="Water Level Sensor">Water Level Sensor</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="display:flex; flex-direction:column; gap:8px;">
+                <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Minimum Alert Level *</label>
+                <select id="rule-level" class="custom-select" style="width:100%;" required>
+                  <option value="warning">Warning Level</option>
+                  <option value="critical">Critical Level Only</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="display:flex; flex-direction:column; gap:8px;">
+                <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Dispatch Channel *</label>
+                <select id="rule-channel" class="custom-select" style="width:100%;" required>
+                  <option value="email">Email Notification Alert</option>
+                  <option value="sms">SMS Text Dispatch</option>
+                  <option value="voice">Automated Voice Broadcast</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="display:flex; flex-direction:column; gap:8px;">
+                <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Recipient Contact Address *</label>
+                <input type="text" id="rule-recipient" class="search-input" style="width:100%;" placeholder="e.g. engineer@sansah.com or +15550199" required>
+              </div>
+
+              <button type="submit" class="custom-btn" style="width:100%; margin-top:8px; justify-content:center;">
+                <i data-lucide="plus"></i>
+                <span>Add Notification Rule</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Rules Grid -->
+          <div class="glass-card">
+            <div class="card-header-flex">
+              <h3 class="card-title">
+                <i data-lucide="list"></i>
+                <span>Active Rules Matrix</span>
+              </h3>
+              <span id="rules-count-badge" class="sensor-id-tag" style="background: rgba(0, 242, 254, 0.1); color: var(--color-primary);">0 Active Rules</span>
+            </div>
+            <div class="rules-list-container" id="rules-list-container">
+              <!-- Dynamically populated rule cards -->
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- MODAL: Sensor Details & Chart Trends -->
+  <div class="modal-overlay" id="modal-sensor-details">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="sensor-modal-title">Sensor Detail View</h3>
+        <button class="modal-close-btn" id="close-sensor-modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="sensor-detail-grid">
+          
+          <!-- Metric display & details list -->
+          <div class="sensor-detail-sidebar">
+            <div class="detail-metric-card">
+              <span class="detail-metric-label">Current Reading</span>
+              <span class="detail-metric-value" id="sensor-modal-value">0</span>
+              <span id="sensor-modal-unit" style="font-size:0.9rem; color:var(--text-muted);"></span>
+            </div>
+            
+            <div class="detail-info-list">
+              <div class="detail-info-item">
+                <span>Device ID</span>
+                <span id="sensor-modal-device-id" class="sensor-id-tag">ESP32_01</span>
+              </div>
+              <div class="detail-info-item">
+                <span>Hardware</span>
+                <span id="sensor-modal-hardware" style="font-weight: 500;">ESP32</span>
+              </div>
+              <div class="detail-info-item">
+                <span>Location</span>
+                <span id="sensor-modal-location" style="font-weight: 500;">Server Room</span>
+              </div>
+              <div class="detail-info-item">
+                <span>Health Score</span>
+                <span id="sensor-modal-health" style="color:var(--color-success); font-weight:600;">100%</span>
+              </div>
+              <div class="detail-info-item">
+                <span>Battery Level</span>
+                <span id="sensor-modal-battery" style="font-weight: 500;">94%</span>
+              </div>
+              <div class="detail-info-item">
+                <span>Last Updated</span>
+                <span id="sensor-modal-last-updated" style="font-family:var(--font-mono); font-size:0.75rem;">12:00:00</span>
+              </div>
+            </div>
+            
+            <!-- Threshold configs -->
+            <div class="detail-info-list" id="sensor-modal-threshold-container">
+              <div class="card-title" style="font-size:0.85rem; margin-bottom: 8px;">
+                <i data-lucide="sliders" style="width:14px;"></i>
+                <span>Threshold Limits</span>
+              </div>
+              <div class="threshold-slider-group">
+                <div class="slider-labels">
+                  <span>Critical Limit:</span>
+                  <span id="threshold-val-display" style="color:var(--color-danger); font-weight:600;">50.0</span>
+                </div>
+                <input type="range" id="threshold-range-input" class="slider-range-input" min="0" max="100" step="1">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Chart history -->
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div class="glass-card" style="padding: 16px; flex-grow:1;">
+              <div class="card-title" style="font-size: 0.95rem; margin-bottom: 12px;">
+                <i data-lucide="line-chart"></i>
+                <span>Historical Trend (Real-time telemetry)</span>
+              </div>
+              <div class="chart-container" style="height: 250px;">
+                <canvas id="sensorDetailChart"></canvas>
+              </div>
+            </div>
+            
+            <div class="glass-card" style="padding: 16px;">
+              <div class="card-title" style="font-size:0.95rem; margin-bottom: 8px;">
+                <i data-lucide="alert-octagon" style="color:var(--color-danger);"></i>
+                <span>Sensor History</span>
+              </div>
+              <div class="activity-feed" id="sensor-modal-history-feed" style="max-height:100px;">
+                <!-- Dynamically populated sensor trigger logs -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Register New Device -->
+  <div class="modal-overlay" id="modal-register-device">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>Register New IoT Device</h3>
+        <button class="modal-close-btn" id="close-register-modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="form-register-device">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="reg-device-id">Device ID *</label>
+              <input type="text" id="reg-device-id" class="form-control" placeholder="e.g. ESP32_NOD_04" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="reg-device-name">Device Name *</label>
+              <input type="text" id="reg-device-name" class="form-control" placeholder="e.g. Server Room B Controller" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="reg-device-type">Hardware Controller *</label>
+              <select id="reg-device-type" class="form-control" required>
+                <option value="ESP32">ESP32 Microcontroller</option>
+                <option value="NodeMCU">NodeMCU Board</option>
+                <option value="Arduino">Arduino WiFi Board</option>
+                <option value="Smart IoT Tracker">Smart IoT Tracker</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="reg-location">Installation Location</label>
+              <input type="text" id="reg-location" class="form-control" placeholder="e.g. Warehouse Zone A" value="Default Zone">
+            </div>
+
+            <div class="form-group col-span-2">
+              <label>Available Sensor Hardware Modules</label>
+              <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px; background:rgba(0,0,0,0.1); padding:12px; border-radius:8px; border:1px solid var(--border-color);">
+                <label class="checkbox-group">
+                  <input type="checkbox" id="reg-sensor-temp" checked>
+                  <span>DHT11 Temperature Sensor Module</span>
+                </label>
+                <label class="checkbox-group">
+                  <input type="checkbox" id="reg-sensor-hum" checked>
+                  <span>DHT11 Humidity Sensor Module</span>
+                </label>
+                <label class="checkbox-group">
+                  <input type="checkbox" id="reg-sensor-motion">
+                  <span>PIR Motion Detector Module</span>
+                </label>
+                <label class="checkbox-group">
+                  <input type="checkbox" id="reg-sensor-water">
+                  <span>Water Level Probe Sensor</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label class="checkbox-group">
+                <input type="checkbox" id="reg-gps-enabled">
+                <span style="font-weight:600; color:var(--color-primary);">Enable GPS Geo-Tracking Board</span>
+              </label>
+              <span style="font-size:0.75rem; color:var(--text-muted); margin-left:28px;">This will add the device to the Live GPS Map and route tracker.</span>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="custom-btn custom-btn-secondary" id="btn-cancel-register">Cancel</button>
+            <button type="submit" class="custom-btn">Register Device</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Create Geofence -->
+  <div class="modal-overlay" id="modal-add-geofence">
+    <div class="modal-content" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3>Create Geofence Boundary</h3>
+        <button class="modal-close-btn" id="close-geofence-modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="form-create-geofence">
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div class="form-group">
+              <label for="fence-name">Geofence Name *</label>
+              <input type="text" id="fence-name" class="form-control" placeholder="e.g. Delivery Center Zone" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="fence-lat">Latitude Coordinate *</label>
+              <input type="number" id="fence-lat" class="form-control" step="0.000001" placeholder="e.g. 34.0522" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="fence-lng">Longitude Coordinate *</label>
+              <input type="number" id="fence-lng" class="form-control" step="0.000001" placeholder="e.g. -118.2437" required>
+            </div>
+
+            <div class="form-group">
+              <label for="fence-radius">Radius (meters) *</label>
+              <input type="number" id="fence-radius" class="form-control" min="50" max="50000" value="500" required>
+            </div>
+            
+            <span style="font-size:0.75rem; color:var(--text-muted);">
+              Geofences are circles of specified radius centered at the selected coordinates. When a GPS tracker moves outside or inside, alerts are triggered automatically.
+            </span>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="custom-btn custom-btn-secondary" id="btn-cancel-geofence">Cancel</button>
+            <button type="submit" class="custom-btn">Create Geofence</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="simulator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

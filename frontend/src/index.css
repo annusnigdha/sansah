@@ -1,0 +1,386 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply transition-colors duration-300;
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+  }
+}
+
+:root {
+  --bg-app: #0b131a;
+  --bg-card: rgba(15, 28, 41, 0.6);
+  --bg-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --bg-header: rgba(15, 28, 41, 0.35);
+  --bg-sidebar: rgba(15, 28, 41, 0.7);
+}
+
+.light {
+  --bg-app: #f0f4f8;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-border: rgba(0, 0, 0, 0.12);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --bg-header: rgba(255, 255, 255, 0.85);
+  --bg-sidebar: rgba(255, 255, 255, 0.92);
+}
+
+/* Light mode overrides for hardcoded Tailwind classes */
+.light .text-slate-100,
+.light .text-slate-200,
+.light .text-slate-300,
+.light .text-slate-350,
+.light .text-slate-355,
+.light .text-slate-400,
+.light .text-slate-50,
+.light .text-gray-100,
+.light .text-gray-200,
+.light .text-gray-300 {
+  color: var(--text-primary) !important;
+}
+
+.light .text-slate-500,
+.light .text-slate-600,
+.light .text-gray-400,
+.light .text-gray-500 {
+  color: var(--text-secondary) !important;
+}
+
+.light .bg-\[\#070d12\],
+.light .bg-\[\#0b131a\],
+.light .bg-\[\#0c141d\],
+.light .bg-\[\#0e1620\],
+.light .bg-slate-800,
+.light .bg-slate-850,
+.light .bg-slate-855,
+.light .bg-slate-900,
+.light .bg-slate-950,
+.light .bg-slate-900\/60,
+.light .bg-slate-950\/60 {
+  background-color: var(--bg-card) !important;
+}
+
+.light .bg-slate-700,
+.light .bg-slate-750,
+.light .bg-slate-800\/50,
+.light .bg-slate-900\/50 {
+  background-color: #e2e8f0 !important;
+}
+
+.light .hover\:bg-slate-800:hover,
+.light .hover\:bg-slate-750:hover,
+.light .hover\:bg-slate-900:hover,
+.light .hover\:bg-slate-850:hover {
+  background-color: #cbd5e1 !important;
+}
+
+.light .border-slate-700,
+.light .border-slate-750,
+.light .border-slate-800,
+.light .border-slate-850,
+.light .border-slate-900,
+.light .border-slate-800\/50 {
+  border-color: var(--bg-border) !important;
+}
+
+.light .border-slate-300 {
+  border-color: #cbd5e1 !important;
+}
+
+.light input,
+.light select,
+.light textarea {
+  color: var(--text-primary) !important;
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Ensure modal containers and titles are fully readable */
+.light .bg-slate-900\/80,
+.light .bg-black\/50,
+.light .bg-black\/60 {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.light [role="dialog"],
+.light .glass-card,
+.light .modal-content {
+  background-color: #ffffff !important;
+  color: var(--text-primary) !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Ensure text inside dialogue tables, paragraphs, spans is dark */
+.light p.text-white,
+.light span.text-white:not(.bg-cyan-600 *):not(.bg-blue-600 *):not(.bg-red-600 *):not(.bg-emerald-600 *):not(.bg-amber-600 *):not(button *),
+.light h1.text-white,
+.light h2.text-white,
+.light h3.text-white,
+.light h4.text-white,
+.light div.text-white:not(.bg-cyan-600 *):not(.bg-blue-600 *):not(.bg-red-600 *):not(.bg-emerald-600 *):not(.bg-amber-600 *):not(button *) {
+  color: var(--text-primary) !important;
+}
+
+/* Color tweaks for high contrast neon tags in light mode */
+.light .text-cyan-400 {
+  color: #0284c7 !important;
+}
+
+.light .text-emerald-400 {
+  color: #15803d !important;
+}
+
+.light .text-amber-400 {
+  color: #b45309 !important;
+}
+
+.light .text-red-400 {
+  color: #be123c !important;
+}
+
+.light .text-blue-400 {
+  color: #1d4ed8 !important;
+}
+
+.light th.text-slate-300,
+.light th.text-slate-400,
+.light th.text-gray-400 {
+  color: var(--text-primary) !important;
+  background-color: #f1f5f9 !important;
+}
+
+.light .google-maps-dark {
+  filter: none !important;
+}
+
+.light .custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--bg-border) !important;
+}
+
+.light .custom-leaflet-popup .leaflet-popup-tip {
+  background-color: var(--bg-card) !important;
+  border-left: 1px solid var(--bg-border) !important;
+  border-bottom: 1px solid var(--bg-border) !important;
+}
+
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Glassmorphism Panels */
+.glass-card {
+  @apply backdrop-blur-md border transition-all duration-300;
+  background-color: var(--bg-card);
+  border-color: var(--bg-border);
+}
+
+/* Leaflet Map Pulsing Pins */
+.custom-map-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.marker-pulse {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  animation: marker-pulse-anim 2s infinite ease-out;
+  opacity: 0;
+  border: 2px solid inherit;
+}
+
+@keyframes marker-pulse-anim {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 0.55;
+  }
+
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Skeleton Loading Pulse */
+.skeleton-pulse {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse-anim 1.5s infinite;
+}
+
+@keyframes skeleton-pulse-anim {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Success Checkmark Animation */
+.success-checkmark-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 4px solid #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+  animation: circle-expand 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.success-checkmark-icon {
+  color: #10b981;
+  width: 32px;
+  height: 32px;
+  opacity: 0;
+  transform: scale(0.5);
+  animation: checkmark-pop 0.4s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes circle-expand {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes checkmark-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Neon Glow Animations */
+.neon-pulse-cyan {
+  animation: neon-cyan-glow 3s infinite alternate;
+}
+
+@keyframes neon-cyan-glow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.2), 0 0 20px rgba(0, 242, 254, 0.1);
+  }
+
+  100% {
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.45), 0 0 40px rgba(0, 242, 254, 0.2);
+  }
+}
+
+.neon-pulse-purple {
+  animation: neon-purple-glow 3.5s infinite alternate;
+}
+
+@keyframes neon-purple-glow {
+  0% {
+    box-shadow: 0 0 10px rgba(127, 0, 254, 0.2), 0 0 20px rgba(127, 0, 254, 0.1);
+  }
+
+  100% {
+    box-shadow: 0 0 20px rgba(127, 0, 254, 0.45), 0 0 40px rgba(127, 0, 254, 0.2);
+  }
+}
+
+/* Float Animation */
+.animate-float {
+  animation: float-anim 6s ease-in-out infinite;
+}
+
+@keyframes float-anim {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Premium Dark Mode Map Tile Filter */
+.google-maps-dark {
+  filter: invert(90%) hue-rotate(185deg) brightness(85%) contrast(110%);
+}
+
+.custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background-color: #0b131a !important;
+  color: #cbd5e1 !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 12px !important;
+}
+
+.custom-leaflet-popup .leaflet-popup-tip {
+  background-color: #0b131a !important;
+  border-left: 1px solid #1e293b !important;
+  border-bottom: 1px solid #1e293b !important;
+}
+
+/* AI Chatbot Sliding Drawer */
+.animate-slide-in-right {
+  animation: slide-in-right-anim 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slide-in-right-anim {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}

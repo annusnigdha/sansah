@@ -1,0 +1,4 @@
+To: +917907154049
+Date: Mon, 22 Jun 2026 04:53:55 GMT
+Message:
+CRITICAL: Device Server Room A Climate Controller (ESP32_01) has gone OFFLINE. Connection heartbeat lost.

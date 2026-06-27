@@ -1,0 +1,4 @@
+To: +917907154049
+Date: Fri, 26 Jun 2026 07:00:47 GMT
+Message:
+Server Room A Climate Controller DHT11 Temp Valid reading: 60°C (exceeded threshold 28°C).

@@ -1,0 +1,4 @@
+To: +15551234
+Date: Thu, 25 Jun 2026 15:50:21 GMT
+Message:
+Audit Test Device Moisture Sensor reading: 70.5% (exceeded threshold 70%).

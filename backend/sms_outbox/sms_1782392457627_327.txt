@@ -1,0 +1,4 @@
+To: +917907154049
+Date: Thu, 25 Jun 2026 13:00:57 GMT
+Message:
+Soil Monitoring Unit Wind Direction Sensor Sensor reading: 103° (exceeded threshold 100°).

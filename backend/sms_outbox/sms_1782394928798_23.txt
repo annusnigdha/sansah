@@ -1,0 +1,4 @@
+To: +14155552671
+Date: Thu, 25 Jun 2026 13:42:08 GMT
+Message:
+soil_node_01 Soil Temperature Sensor reading: 50.1°C (exceeded threshold 50°C).

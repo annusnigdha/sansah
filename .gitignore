@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.node/
+
+# Environment files (keep secrets safe!)
+.env
+*.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary/scratch files
+scratch/
+
+# IDE
+.vscode/
+.idea/
+
+# Database files (runtime data)
+backend/database.sqlite
+*.sqlite
+*.db
+
+# Runtime generated mail/message files
+backend/mailbox/
+backend/whatsapp_outbox/

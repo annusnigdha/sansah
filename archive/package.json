@@ -1,0 +1,8 @@
+{
+  "name": "aether-iot",
+  "version": "1.0.0",
+  "description": "Enterprise IoT Alert Notification & GPS Tracking System",
+  "scripts": {
+    "dev": "npx -y http-server -p 3000"
+  }
+}
